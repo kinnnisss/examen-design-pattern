@@ -121,3 +121,7 @@ Content-Type: application/json
   "receiverPhone": "+221770000001",
   "amount": 1000.00
 }
+
+### Consulter l'historique des transactions
+GET {{walletHost}}/api/wallets/+221779998877/transactions
+Content-Type: application/json

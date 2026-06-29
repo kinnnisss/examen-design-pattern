@@ -10,6 +10,8 @@ import edu.ism.badwallet_api.dto.response.WalletBalanceResponse;
 import edu.ism.badwallet_api.dto.response.WalletResponse;
 import edu.ism.badwallet_api.dto.response.WithdrawalResponse;
 import org.springframework.data.domain.Page;
+import edu.ism.badwallet_api.dto.response.TransactionResponse;
+import java.util.List;
 
 public interface WalletService {
 
@@ -26,4 +28,5 @@ public interface WalletService {
     WithdrawalResponse withdraw(WithdrawalRequest request);
 
     TransferResponse transfer(TransferRequest request);
+List<TransactionResponse> getTransactionHistory(String phoneNumber);
 }

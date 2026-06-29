@@ -28,6 +28,10 @@ import edu.ism.badwallet_api.strategy.WithdrawalFeeStrategy;
 import java.math.BigDecimal;
 import edu.ism.badwallet_api.dto.request.TransferRequest;
 import edu.ism.badwallet_api.dto.response.TransferResponse;
+import edu.ism.badwallet_api.dto.response.TransactionResponse;
+import edu.ism.badwallet_api.mapper.TransactionMapper;
+import java.util.List;
+
 
 
 @Service
@@ -232,5 +236,21 @@ public TransferResponse transfer(TransferRequest request) {
             sender.getCurrency(),
             savedSenderTransaction.getCreatedAt()
     );
+}
+
+@Override
+@Transactional(readOnly = true)
+public List<TransactionResponse> getTransactionHistory(String phoneNumber) {
+    if (!walletRepository.existsByPhoneNumber(phoneNumber)) {
+        throw new ResourceNotFoundException(
+                "Aucun portefeuille trouvé pour le numéro : " + phoneNumber
+        );
+    }
+
+    return transactionRepository
+            .findByWalletPhoneNumberOrderByCreatedAtDesc(phoneNumber)
+            .stream()
+            .map(TransactionMapper::toResponse)
+            .toList();
 }
 }

@@ -22,6 +22,12 @@ import edu.ism.badwallet_api.dto.response.DepositResponse;
 import edu.ism.badwallet_api.dto.response.WalletBalanceResponse;
 import edu.ism.badwallet_api.dto.request.TransferRequest;
 import edu.ism.badwallet_api.dto.response.TransferResponse;
+import edu.ism.badwallet_api.dto.response.TransactionResponse;
+import java.util.List;
+
+
+
+
 @RestController
 @RequestMapping("/api/wallets")
 @RequiredArgsConstructor
@@ -63,6 +69,14 @@ public ResponseEntity<WalletBalanceResponse> getWalletBalance(
             walletService.getWalletBalance(phoneNumber)
     );
 }
+@GetMapping("/{phoneNumber}/transactions")
+public ResponseEntity<List<TransactionResponse>> getTransactionHistory(
+        @PathVariable String phoneNumber
+) {
+    return ResponseEntity.ok(
+            walletService.getTransactionHistory(phoneNumber)
+    );
+}
     @GetMapping("/{phoneNumber}")
 public ResponseEntity<WalletResponse> getWalletByPhoneNumber(
         @PathVariable String phoneNumber
@@ -91,4 +105,5 @@ public ResponseEntity<TransferResponse> transfer(
 ) {
     return ResponseEntity.ok(walletService.transfer(request));
 }
+
 }
