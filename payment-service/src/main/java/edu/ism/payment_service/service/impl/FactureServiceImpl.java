@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import edu.ism.payment_service.dto.response.SpecificFacturesPreviewResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,24 @@ public class FactureServiceImpl implements FactureService {
 
     private final FactureRepository factureRepository;
 
+    @Override
+@Transactional(readOnly = true)
+public SpecificFacturesPreviewResponse previewSpecificFactures(
+        PaySpecificFacturesRequest request
+) {
+    List<Facture> factures = getAndValidateUnpaidFactures(request);
+
+    BigDecimal total = factures.stream()
+            .map(Facture::getAmount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    return new SpecificFacturesPreviewResponse(
+            request.walletCode(),
+            request.serviceName().name(),
+            factures.stream().map(Facture::getReference).toList(),
+            total
+    );
+}
     @Override
     @Transactional(readOnly = true)
     public List<FactureResponse> getCurrentUnpaidFactures(
@@ -115,58 +134,31 @@ public class FactureServiceImpl implements FactureService {
         );
     }
 
-    @Override
-    public FacturePaymentResponse paySpecificFactures(
-            PaySpecificFacturesRequest request
-    ) {
-        List<Facture> factures = request.factureReferences()
-                .stream()
-                .map(reference -> factureRepository
-                        .findByReferenceAndWalletCode(reference, request.walletCode())
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                "Facture introuvable : " + reference
-                        )))
-                .toList();
+@Override
+public FacturePaymentResponse paySpecificFactures(
+        PaySpecificFacturesRequest request
+) {
+    List<Facture> factures = getAndValidateUnpaidFactures(request);
 
-        for (Facture facture : factures) {
-            if (facture.getServiceName() != request.serviceName()) {
-                throw new BusinessException(
-                        "La facture "
-                                + facture.getReference()
-                                + " ne correspond pas au service "
-                                + request.serviceName()
-                );
-            }
+    LocalDateTime paidAt = LocalDateTime.now();
 
-            if (facture.getStatus() == FactureStatus.PAID) {
-                throw new BusinessException(
-                        "La facture "
-                                + facture.getReference()
-                                + " est déjà payée."
-                );
-            }
-        }
+    factures.forEach(facture -> {
+        facture.setStatus(FactureStatus.PAID);
+        facture.setPaidAt(paidAt);
+    });
 
-        LocalDateTime paidAt = LocalDateTime.now();
+    BigDecimal total = factures.stream()
+            .map(Facture::getAmount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        factures.forEach(facture -> {
-            facture.setStatus(FactureStatus.PAID);
-            facture.setPaidAt(paidAt);
-        });
-
-        BigDecimal total = factures.stream()
-                .map(Facture::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return new FacturePaymentResponse(
-                request.walletCode(),
-                request.serviceName().name(),
-                factures.stream().map(Facture::getReference).toList(),
-                total,
-                paidAt
-        );
-    }
-
+    return new FacturePaymentResponse(
+            request.walletCode(),
+            request.serviceName().name(),
+            factures.stream().map(Facture::getReference).toList(),
+            total,
+            paidAt
+    );
+}
     private FactureResponse toResponse(Facture facture) {
         return new FactureResponse(
                 facture.getReference(),
@@ -180,4 +172,37 @@ public class FactureServiceImpl implements FactureService {
                 facture.getPaidAt()
         );
     }
+    private List<Facture> getAndValidateUnpaidFactures(
+        PaySpecificFacturesRequest request
+) {
+    List<Facture> factures = request.factureReferences()
+            .stream()
+            .map(reference -> factureRepository
+                    .findByReferenceAndWalletCode(reference, request.walletCode())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Facture introuvable : " + reference
+                    )))
+            .toList();
+
+    for (Facture facture : factures) {
+        if (facture.getServiceName() != request.serviceName()) {
+            throw new BusinessException(
+                    "La facture "
+                            + facture.getReference()
+                            + " ne correspond pas au service "
+                            + request.serviceName()
+            );
+        }
+
+        if (facture.getStatus() == FactureStatus.PAID) {
+            throw new BusinessException(
+                    "La facture "
+                            + facture.getReference()
+                            + " est déjà payée."
+            );
+        }
+    }
+
+    return factures;
+}
 }

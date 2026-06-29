@@ -4,6 +4,10 @@ import edu.ism.badwallet_api.dto.response.ExternalFactureResponse;
 import java.time.LocalDate;
 import java.util.List;
 
+import edu.ism.badwallet_api.dto.request.ExternalPayCurrentFactureRequest;
+import edu.ism.badwallet_api.dto.request.ExternalPaySpecificFacturesRequest;
+import edu.ism.badwallet_api.dto.response.ExternalFacturePaymentResponse;
+import edu.ism.badwallet_api.dto.response.ExternalSpecificFacturesPreviewResponse;
 public interface PaymentServiceClient {
 
     List<ExternalFactureResponse> getCurrentUnpaidFactures(
@@ -16,4 +20,16 @@ public interface PaymentServiceClient {
             LocalDate debut,
             LocalDate fin
     );
+
+    ExternalFacturePaymentResponse payCurrentFacture(
+        ExternalPayCurrentFactureRequest request
+);
+
+ExternalSpecificFacturesPreviewResponse previewSpecificFactures(
+        ExternalPaySpecificFacturesRequest request
+);
+
+ExternalFacturePaymentResponse paySpecificFactures(
+        ExternalPaySpecificFacturesRequest request
+);
 }

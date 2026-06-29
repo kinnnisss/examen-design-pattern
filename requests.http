@@ -155,3 +155,25 @@ Content-Type: application/json
 ### Proxy - factures impayées sur une période
 GET {{walletHost}}/api/external/factures/WLT-0000003/periode?debut=2026-05-01&fin=2026-07-01
 Content-Type: application/json
+
+### Payer une facture du mois en cours
+POST {{walletHost}}/api/wallets/pay
+Content-Type: application/json
+
+{
+  "phoneNumber": "+221770000003",
+  "serviceName": "ISM",
+  "amount": 5000.00
+}
+
+###
+
+### Payer des factures spécifiques
+POST {{walletHost}}/api/wallets/pay-factures
+Content-Type: application/json
+
+{
+  "phoneNumber": "+221770000003",
+  "serviceName": "ISM",
+  "factureReferences": ["FAC-ISM-3-1", "FAC-ISM-3-3"]
+}

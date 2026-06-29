@@ -12,6 +12,9 @@ import edu.ism.badwallet_api.dto.response.WithdrawalResponse;
 import org.springframework.data.domain.Page;
 import edu.ism.badwallet_api.dto.response.TransactionResponse;
 import java.util.List;
+import edu.ism.badwallet_api.dto.request.PayCurrentBillRequest;
+import edu.ism.badwallet_api.dto.request.PaySpecificBillsRequest;
+import edu.ism.badwallet_api.dto.response.BillPaymentResponse;
 
 public interface WalletService {
 
@@ -29,4 +32,7 @@ public interface WalletService {
 
     TransferResponse transfer(TransferRequest request);
 List<TransactionResponse> getTransactionHistory(String phoneNumber);
+BillPaymentResponse payCurrentBill(PayCurrentBillRequest request);
+
+BillPaymentResponse paySpecificBills(PaySpecificBillsRequest request);
 }

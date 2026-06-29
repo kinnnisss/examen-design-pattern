@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import main.java.edu.ism.payment_service.dto.response.SpecificFacturesPreviewResponse;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import edu.ism.payment_service.dto.response.SpecificFacturesPreviewResponse;
 
 @RestController
 @RequestMapping("/api/internal/factures")
@@ -66,4 +69,12 @@ public class FactureInternalController {
                 factureService.paySpecificFactures(request)
         );
     }
+    @PostMapping("/preview-specific")
+public ResponseEntity<SpecificFacturesPreviewResponse> previewSpecificFactures(
+        @Valid @RequestBody PaySpecificFacturesRequest request
+) {
+    return ResponseEntity.ok(
+            factureService.previewSpecificFactures(request)
+    );
+}
 }

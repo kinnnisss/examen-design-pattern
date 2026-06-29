@@ -11,6 +11,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import edu.ism.badwallet_api.dto.request.ExternalPayCurrentFactureRequest;
+import edu.ism.badwallet_api.dto.request.ExternalPaySpecificFacturesRequest;
+import edu.ism.badwallet_api.dto.response.ExternalFacturePaymentResponse;
+import edu.ism.badwallet_api.dto.response.ExternalSpecificFacturesPreviewResponse;
+import org.springframework.http.MediaType;
 
 @Component
 @RequiredArgsConstructor
@@ -74,4 +79,62 @@ public List<ExternalFactureResponse> getCurrentUnpaidFactures(
             );
         }
     }
+
+@Override
+public ExternalFacturePaymentResponse payCurrentFacture(
+        ExternalPayCurrentFactureRequest request
+) {
+    try {
+        return paymentServiceRestClient.post()
+                .uri("/api/internal/factures/pay-current")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .body(ExternalFacturePaymentResponse.class);
+
+    } catch (RestClientException exception) {
+        throw new BusinessException(
+                "Le paiement de la facture a échoué auprès du payment-service."
+        );
+    }
+}
+
+@Override
+public ExternalSpecificFacturesPreviewResponse previewSpecificFactures(
+        ExternalPaySpecificFacturesRequest request
+) {
+    try {
+        return paymentServiceRestClient.post()
+                .uri("/api/internal/factures/preview-specific")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .body(ExternalSpecificFacturesPreviewResponse.class);
+
+    } catch (RestClientException exception) {
+        throw new BusinessException(
+                "Impossible de vérifier les factures auprès du payment-service."
+        );
+    }
+}
+
+@Override
+public ExternalFacturePaymentResponse paySpecificFactures(
+        ExternalPaySpecificFacturesRequest request
+) {
+    try {
+        return paymentServiceRestClient.post()
+                .uri("/api/internal/factures/pay-specific")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .body(ExternalFacturePaymentResponse.class);
+
+    } catch (RestClientException exception) {
+        throw new BusinessException(
+                "Le paiement des factures a échoué auprès du payment-service."
+        );
+    }
+}
+
 }

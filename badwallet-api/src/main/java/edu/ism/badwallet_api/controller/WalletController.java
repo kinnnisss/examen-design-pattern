@@ -18,12 +18,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import edu.ism.badwallet_api.dto.request.WithdrawalRequest;
 import edu.ism.badwallet_api.dto.response.WithdrawalResponse;
 import edu.ism.badwallet_api.dto.request.DepositRequest;
+import edu.ism.badwallet_api.dto.request.PayCurrentBillRequest;
+import edu.ism.badwallet_api.dto.request.PaySpecificBillsRequest;
+import edu.ism.badwallet_api.dto.response.BillPaymentResponse;
 import edu.ism.badwallet_api.dto.response.DepositResponse;
 import edu.ism.badwallet_api.dto.response.WalletBalanceResponse;
 import edu.ism.badwallet_api.dto.request.TransferRequest;
 import edu.ism.badwallet_api.dto.response.TransferResponse;
 import edu.ism.badwallet_api.dto.response.TransactionResponse;
 import java.util.List;
+
 
 
 
@@ -106,4 +110,22 @@ public ResponseEntity<TransferResponse> transfer(
     return ResponseEntity.ok(walletService.transfer(request));
 }
 
+
+@PostMapping("/pay")
+public ResponseEntity<BillPaymentResponse> payCurrentBill(
+        @Valid @RequestBody PayCurrentBillRequest request
+) {
+    return ResponseEntity.ok(
+            walletService.payCurrentBill(request)
+    );
+}
+
+@PostMapping("/pay-factures")
+public ResponseEntity<BillPaymentResponse> paySpecificBills(
+        @Valid @RequestBody PaySpecificBillsRequest request
+) {
+    return ResponseEntity.ok(
+            walletService.paySpecificBills(request)
+    );
+}
 }

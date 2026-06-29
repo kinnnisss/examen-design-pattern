@@ -31,7 +31,14 @@ import edu.ism.badwallet_api.dto.response.TransferResponse;
 import edu.ism.badwallet_api.dto.response.TransactionResponse;
 import edu.ism.badwallet_api.mapper.TransactionMapper;
 import java.util.List;
-
+import edu.ism.badwallet_api.client.PaymentServiceClient;
+import edu.ism.badwallet_api.dto.request.ExternalPayCurrentFactureRequest;
+import edu.ism.badwallet_api.dto.request.ExternalPaySpecificFacturesRequest;
+import edu.ism.badwallet_api.dto.request.PayCurrentBillRequest;
+import edu.ism.badwallet_api.dto.request.PaySpecificBillsRequest;
+import edu.ism.badwallet_api.dto.response.BillPaymentResponse;
+import edu.ism.badwallet_api.dto.response.ExternalFacturePaymentResponse;
+import edu.ism.badwallet_api.dto.response.ExternalSpecificFacturesPreviewResponse;
 
 
 @Service
@@ -40,6 +47,7 @@ import java.util.List;
 public class WalletServiceImpl implements WalletService {
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
+    private final PaymentServiceClient paymentServiceClient;
 private final WithdrawalFeeStrategy withdrawalFeeStrategy;
     @Override
 @Transactional(readOnly = true)
@@ -252,5 +260,116 @@ public List<TransactionResponse> getTransactionHistory(String phoneNumber) {
             .stream()
             .map(TransactionMapper::toResponse)
             .toList();
+}
+
+@Override
+public BillPaymentResponse payCurrentBill(PayCurrentBillRequest request) {
+    Wallet wallet = getWalletByPhone(request.phoneNumber());
+
+    if (wallet.getBalance().compareTo(request.amount()) < 0) {
+        throw new BusinessException(
+                "Solde insuffisant pour payer cette facture."
+        );
+    }
+
+    ExternalFacturePaymentResponse externalPayment =
+            paymentServiceClient.payCurrentFacture(
+                    new ExternalPayCurrentFactureRequest(
+                            wallet.getCode(),
+                            request.serviceName(),
+                            request.amount()
+                    )
+            );
+
+    if (wallet.getBalance().compareTo(externalPayment.totalPaid()) < 0) {
+        throw new BusinessException(
+                "Solde insuffisant pour le montant réel de la facture."
+        );
+    }
+
+    wallet.setBalance(
+            wallet.getBalance().subtract(externalPayment.totalPaid())
+    );
+
+    Transaction transaction = TransactionFactory.createBillPayment(
+            wallet,
+            externalPayment.totalPaid(),
+            request.serviceName().name(),
+            "Paiement facture " + request.serviceName()
+                    + " : "
+                    + String.join(", ", externalPayment.paidFactureReferences())
+    );
+
+    Transaction savedTransaction = transactionRepository.save(transaction);
+
+    return new BillPaymentResponse(
+            savedTransaction.getId(),
+            wallet.getPhoneNumber(),
+            wallet.getCode(),
+            request.serviceName().name(),
+            externalPayment.paidFactureReferences(),
+            externalPayment.totalPaid(),
+            wallet.getBalance(),
+            wallet.getCurrency(),
+            externalPayment.paidAt()
+    );
+}
+
+@Override
+public BillPaymentResponse paySpecificBills(PaySpecificBillsRequest request) {
+    Wallet wallet = getWalletByPhone(request.phoneNumber());
+
+    ExternalPaySpecificFacturesRequest externalRequest =
+            new ExternalPaySpecificFacturesRequest(
+                    wallet.getCode(),
+                    request.serviceName(),
+                    request.factureReferences()
+            );
+
+    ExternalSpecificFacturesPreviewResponse preview =
+            paymentServiceClient.previewSpecificFactures(externalRequest);
+
+    if (wallet.getBalance().compareTo(preview.totalAmount()) < 0) {
+        throw new BusinessException(
+                "Solde insuffisant pour payer les factures sélectionnées."
+        );
+    }
+
+    ExternalFacturePaymentResponse externalPayment =
+            paymentServiceClient.paySpecificFactures(externalRequest);
+
+    wallet.setBalance(
+            wallet.getBalance().subtract(externalPayment.totalPaid())
+    );
+
+    Transaction transaction = TransactionFactory.createBillPayment(
+            wallet,
+            externalPayment.totalPaid(),
+            request.serviceName().name(),
+            "Paiement factures " + request.serviceName()
+                    + " : "
+                    + String.join(", ", externalPayment.paidFactureReferences())
+    );
+
+    Transaction savedTransaction = transactionRepository.save(transaction);
+
+    return new BillPaymentResponse(
+            savedTransaction.getId(),
+            wallet.getPhoneNumber(),
+            wallet.getCode(),
+            request.serviceName().name(),
+            externalPayment.paidFactureReferences(),
+            externalPayment.totalPaid(),
+            wallet.getBalance(),
+            wallet.getCurrency(),
+            externalPayment.paidAt()
+    );
+}
+
+private Wallet getWalletByPhone(String phoneNumber) {
+    return walletRepository.findByPhoneNumber(phoneNumber)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                    "Aucun portefeuille trouvé pour le numéro : " + phoneNumber
+            ));
 }
 }

@@ -6,6 +6,7 @@ import edu.ism.payment_service.dto.response.FacturePaymentResponse;
 import edu.ism.payment_service.dto.response.FactureResponse;
 import java.time.LocalDate;
 import java.util.List;
+import edu.ism.payment_service.dto.response.SpecificFacturesPreviewResponse;
 
 public interface FactureService {
 
@@ -19,6 +20,9 @@ public interface FactureService {
             LocalDate debut,
             LocalDate fin
     );
+SpecificFacturesPreviewResponse previewSpecificFactures(
+        PaySpecificFacturesRequest request
+);
 
     FacturePaymentResponse payCurrentFacture(PayCurrentFactureRequest request);
 

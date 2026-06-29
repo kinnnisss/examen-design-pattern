@@ -82,4 +82,21 @@ public final class TransactionFactory {
 
         return transaction;
     }
+    public static Transaction createBillPayment(
+        Wallet wallet,
+        BigDecimal amount,
+        String serviceName,
+        String description
+) {
+    Transaction transaction = new Transaction();
+    transaction.setWallet(wallet);
+    transaction.setType(TransactionType.BILL_PAYMENT);
+    transaction.setAmount(amount);
+    transaction.setFee(BigDecimal.ZERO);
+    transaction.setCurrency(wallet.getCurrency());
+    transaction.setPaymentMethod(serviceName);
+    transaction.setDescription(description);
+
+    return transaction;
+}
 }
