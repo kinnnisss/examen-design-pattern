@@ -26,6 +26,9 @@ import edu.ism.badwallet_api.dto.request.WithdrawalRequest;
 import edu.ism.badwallet_api.dto.response.WithdrawalResponse;
 import edu.ism.badwallet_api.strategy.WithdrawalFeeStrategy;
 import java.math.BigDecimal;
+import edu.ism.badwallet_api.dto.request.TransferRequest;
+import edu.ism.badwallet_api.dto.response.TransferResponse;
+
 
 @Service
 @RequiredArgsConstructor
@@ -166,6 +169,68 @@ public WithdrawalResponse withdraw(WithdrawalRequest request) {
             wallet.getBalance(),
             wallet.getCurrency(),
             savedTransaction.getCreatedAt()
+    );
+}
+@Override
+public TransferResponse transfer(TransferRequest request) {
+    if (request.senderPhone().equals(request.receiverPhone())) {
+        throw new BusinessException(
+                "Le portefeuille expéditeur et le portefeuille destinataire doivent être différents."
+        );
+    }
+
+    Wallet sender = walletRepository.findByPhoneNumber(request.senderPhone())
+            .orElseThrow(() -> new ResourceNotFoundException(
+                    "Aucun portefeuille trouvé pour l'expéditeur : "
+                            + request.senderPhone()
+            ));
+
+    Wallet receiver = walletRepository.findByPhoneNumber(request.receiverPhone())
+            .orElseThrow(() -> new ResourceNotFoundException(
+                    "Aucun portefeuille trouvé pour le destinataire : "
+                            + request.receiverPhone()
+            ));
+
+    if (!sender.getCurrency().equals(receiver.getCurrency())) {
+        throw new BusinessException(
+                "Le transfert est impossible entre deux portefeuilles ayant des devises différentes."
+        );
+    }
+
+    if (sender.getBalance().compareTo(request.amount()) < 0) {
+        throw new BusinessException(
+                "Solde insuffisant pour effectuer ce transfert."
+        );
+    }
+
+    sender.setBalance(sender.getBalance().subtract(request.amount()));
+    receiver.setBalance(receiver.getBalance().add(request.amount()));
+
+    Transaction senderTransaction = TransactionFactory.createTransferDebit(
+            sender,
+            receiver,
+            request.amount()
+    );
+
+    Transaction receiverTransaction = TransactionFactory.createTransferCredit(
+            receiver,
+            sender,
+            request.amount()
+    );
+
+    Transaction savedSenderTransaction = transactionRepository.save(senderTransaction);
+    Transaction savedReceiverTransaction = transactionRepository.save(receiverTransaction);
+
+    return new TransferResponse(
+            savedSenderTransaction.getId(),
+            savedReceiverTransaction.getId(),
+            sender.getPhoneNumber(),
+            receiver.getPhoneNumber(),
+            request.amount(),
+            sender.getBalance(),
+            receiver.getBalance(),
+            sender.getCurrency(),
+            savedSenderTransaction.getCreatedAt()
     );
 }
 }

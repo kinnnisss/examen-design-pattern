@@ -44,4 +44,42 @@ public final class TransactionFactory {
 
         return transaction;
     }
+
+    public static Transaction createTransferDebit(
+            Wallet sender,
+            Wallet receiver,
+            BigDecimal amount
+    ) {
+        Transaction transaction = new Transaction();
+        transaction.setWallet(sender);
+        transaction.setType(TransactionType.TRANSFER);
+        transaction.setAmount(amount);
+        transaction.setFee(BigDecimal.ZERO);
+        transaction.setCurrency(sender.getCurrency());
+        transaction.setPaymentMethod("WALLET_TRANSFER");
+        transaction.setDescription(
+                "Transfert envoyé vers le wallet " + receiver.getCode()
+        );
+
+        return transaction;
+    }
+
+    public static Transaction createTransferCredit(
+            Wallet receiver,
+            Wallet sender,
+            BigDecimal amount
+    ) {
+        Transaction transaction = new Transaction();
+        transaction.setWallet(receiver);
+        transaction.setType(TransactionType.TRANSFER);
+        transaction.setAmount(amount);
+        transaction.setFee(BigDecimal.ZERO);
+        transaction.setCurrency(receiver.getCurrency());
+        transaction.setPaymentMethod("WALLET_TRANSFER");
+        transaction.setDescription(
+                "Transfert reçu depuis le wallet " + sender.getCode()
+        );
+
+        return transaction;
+    }
 }

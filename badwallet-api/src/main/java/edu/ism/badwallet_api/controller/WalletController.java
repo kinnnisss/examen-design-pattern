@@ -20,6 +20,8 @@ import edu.ism.badwallet_api.dto.response.WithdrawalResponse;
 import edu.ism.badwallet_api.dto.request.DepositRequest;
 import edu.ism.badwallet_api.dto.response.DepositResponse;
 import edu.ism.badwallet_api.dto.response.WalletBalanceResponse;
+import edu.ism.badwallet_api.dto.request.TransferRequest;
+import edu.ism.badwallet_api.dto.response.TransferResponse;
 @RestController
 @RequestMapping("/api/wallets")
 @RequiredArgsConstructor
@@ -82,5 +84,11 @@ public ResponseEntity<WithdrawalResponse> withdraw(
         @Valid @RequestBody WithdrawalRequest request
 ) {
     return ResponseEntity.ok(walletService.withdraw(request));
+}
+@PostMapping("/transfer")
+public ResponseEntity<TransferResponse> transfer(
+        @Valid @RequestBody TransferRequest request
+) {
+    return ResponseEntity.ok(walletService.transfer(request));
 }
 }
