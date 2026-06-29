@@ -12,3 +12,6 @@ Content-Type: application/json
   "code": "WLT-TEST001",
   "currency": "XOF"
 }
+
+### Lister les portefeuilles avec pagination
+GET {{walletHost}}/api/wallets?page=0&size=10
