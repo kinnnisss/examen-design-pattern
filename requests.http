@@ -138,3 +138,20 @@ GET {{paymentHost}}/api/internal/factures/WLT-0000003/current?unite=WOYAFAL
 
 ### Payment-service - factures impayées par période
 GET {{paymentHost}}/api/internal/factures/WLT-0000003/periode?debut=2026-05-01&fin=2026-07-01
+
+
+### Proxy - factures impayées du mois en cours
+GET {{walletHost}}/api/external/factures/WLT-0000003/current
+Content-Type: application/json
+
+###
+
+### Proxy - factures impayées du mois courant filtrées par unité
+GET {{walletHost}}/api/external/factures/WLT-0000003/current?unite=WOYAFAL
+Content-Type: application/json
+
+###
+
+### Proxy - factures impayées sur une période
+GET {{walletHost}}/api/external/factures/WLT-0000003/periode?debut=2026-05-01&fin=2026-07-01
+Content-Type: application/json
