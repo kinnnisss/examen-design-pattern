@@ -1,4 +1,4 @@
-package main.java.edu.ism.payment_service.service;
+package edu.ism.payment_service.service;
 
 import edu.ism.payment_service.dto.request.PayCurrentFactureRequest;
 import edu.ism.payment_service.dto.request.PaySpecificFacturesRequest;
@@ -11,14 +11,12 @@ public interface FactureService {
 
     List<FactureResponse> getCurrentUnpaidFactures(
             String walletCode,
-            String unite
-    );
+            String unite);
 
     List<FactureResponse> getUnpaidFacturesByPeriod(
             String walletCode,
             LocalDate debut,
-            LocalDate fin
-    );
+            LocalDate fin);
 
     FacturePaymentResponse payCurrentFacture(PayCurrentFactureRequest request);
 

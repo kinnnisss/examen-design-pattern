@@ -1,4 +1,4 @@
-package main.java.edu.ism.payment_service.exception;
+package edu.ism.payment_service.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package main.java.edu.ism.payment_service.entity;
+package edu.ism.payment_service.entity;
 
 public enum ServiceName {
     ISM,

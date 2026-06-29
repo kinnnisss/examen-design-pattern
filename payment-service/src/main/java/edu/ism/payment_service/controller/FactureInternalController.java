@@ -1,4 +1,4 @@
-package main.java.edu.ism.payment_service.controller;
+package edu.ism.payment_service.controller;
 
 import edu.ism.payment_service.dto.request.PayCurrentFactureRequest;
 import edu.ism.payment_service.dto.request.PaySpecificFacturesRequest;
@@ -29,41 +29,31 @@ public class FactureInternalController {
     @GetMapping("/{walletCode}/current")
     public ResponseEntity<List<FactureResponse>> getCurrentUnpaidFactures(
             @PathVariable String walletCode,
-            @RequestParam(required = false) String unite
-    ) {
+            @RequestParam(required = false) String unite) {
         return ResponseEntity.ok(
-                factureService.getCurrentUnpaidFactures(walletCode, unite)
-        );
+                factureService.getCurrentUnpaidFactures(walletCode, unite));
     }
 
     @GetMapping("/{walletCode}/periode")
     public ResponseEntity<List<FactureResponse>> getUnpaidFacturesByPeriod(
             @PathVariable String walletCode,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate debut,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate fin
-    ) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate debut,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin) {
         return ResponseEntity.ok(
-                factureService.getUnpaidFacturesByPeriod(walletCode, debut, fin)
-        );
+                factureService.getUnpaidFacturesByPeriod(walletCode, debut, fin));
     }
 
     @PostMapping("/pay-current")
     public ResponseEntity<FacturePaymentResponse> payCurrentFacture(
-            @Valid @RequestBody PayCurrentFactureRequest request
-    ) {
+            @Valid @RequestBody PayCurrentFactureRequest request) {
         return ResponseEntity.ok(
-                factureService.payCurrentFacture(request)
-        );
+                factureService.payCurrentFacture(request));
     }
 
     @PostMapping("/pay-specific")
     public ResponseEntity<FacturePaymentResponse> paySpecificFactures(
-            @Valid @RequestBody PaySpecificFacturesRequest request
-    ) {
+            @Valid @RequestBody PaySpecificFacturesRequest request) {
         return ResponseEntity.ok(
-                factureService.paySpecificFactures(request)
-        );
+                factureService.paySpecificFactures(request));
     }
 }

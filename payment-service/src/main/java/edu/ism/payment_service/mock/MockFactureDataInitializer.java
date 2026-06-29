@@ -1,4 +1,4 @@
-package main.java.edu.ism.payment_service.mock;
+package edu.ism.payment_service.mock;
 
 import edu.ism.payment_service.entity.Facture;
 import edu.ism.payment_service.entity.FactureStatus;
@@ -30,8 +30,7 @@ public class MockFactureDataInitializer implements CommandLineRunner {
                 ServiceName.ISM,
                 "ISM",
                 new BigDecimal("5000.00"),
-                currentMonth
-        );
+                currentMonth);
 
         createFacture(
                 "FAC-ISM-3-3",
@@ -39,8 +38,7 @@ public class MockFactureDataInitializer implements CommandLineRunner {
                 ServiceName.ISM,
                 "ISM",
                 new BigDecimal("5000.00"),
-                currentMonth.minusMonths(1)
-        );
+                currentMonth.minusMonths(1));
 
         createFacture(
                 "FAC-WOYAFAL-3-1",
@@ -48,8 +46,7 @@ public class MockFactureDataInitializer implements CommandLineRunner {
                 ServiceName.WOYAFAL,
                 "WOYAFAL",
                 new BigDecimal("3000.00"),
-                currentMonth
-        );
+                currentMonth);
 
         createFacture(
                 "FAC-ISM-1-1",
@@ -57,8 +54,7 @@ public class MockFactureDataInitializer implements CommandLineRunner {
                 ServiceName.ISM,
                 "ISM",
                 new BigDecimal("5000.00"),
-                currentMonth
-        );
+                currentMonth);
     }
 
     private void createFacture(
@@ -67,8 +63,7 @@ public class MockFactureDataInitializer implements CommandLineRunner {
             ServiceName serviceName,
             String unite,
             BigDecimal amount,
-            LocalDate billingMonth
-    ) {
+            LocalDate billingMonth) {
         Facture facture = new Facture();
         facture.setReference(reference);
         facture.setWalletCode(walletCode);

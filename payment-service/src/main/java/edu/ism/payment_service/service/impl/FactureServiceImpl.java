@@ -1,4 +1,4 @@
-package main.java.edu.ism.payment_service.service.impl;
+package edu.ism.payment_service.service.impl;
 
 import edu.ism.payment_service.dto.request.PayCurrentFactureRequest;
 import edu.ism.payment_service.dto.request.PaySpecificFacturesRequest;
@@ -29,8 +29,7 @@ public class FactureServiceImpl implements FactureService {
     @Transactional(readOnly = true)
     public List<FactureResponse> getCurrentUnpaidFactures(
             String walletCode,
-            String unite
-    ) {
+            String unite) {
         LocalDate currentMonth = LocalDate.now().withDayOfMonth(1);
 
         List<Facture> factures;
@@ -39,15 +38,13 @@ public class FactureServiceImpl implements FactureService {
             factures = factureRepository.findByWalletCodeAndStatusAndBillingMonth(
                     walletCode,
                     FactureStatus.UNPAID,
-                    currentMonth
-            );
+                    currentMonth);
         } else {
             factures = factureRepository.findByWalletCodeAndStatusAndBillingMonthAndUnite(
                     walletCode,
                     FactureStatus.UNPAID,
                     currentMonth,
-                    unite.toUpperCase()
-            );
+                    unite.toUpperCase());
         }
 
         return factures.stream().map(this::toResponse).toList();
@@ -58,12 +55,10 @@ public class FactureServiceImpl implements FactureService {
     public List<FactureResponse> getUnpaidFacturesByPeriod(
             String walletCode,
             LocalDate debut,
-            LocalDate fin
-    ) {
+            LocalDate fin) {
         if (debut.isAfter(fin)) {
             throw new BusinessException(
-                    "La date de début doit être antérieure ou égale à la date de fin."
-            );
+                    "La date de début doit être antérieure ou égale à la date de fin.");
         }
 
         return factureRepository
@@ -71,8 +66,7 @@ public class FactureServiceImpl implements FactureService {
                         walletCode,
                         FactureStatus.UNPAID,
                         debut.withDayOfMonth(1),
-                        fin.withDayOfMonth(1)
-                )
+                        fin.withDayOfMonth(1))
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -80,8 +74,7 @@ public class FactureServiceImpl implements FactureService {
 
     @Override
     public FacturePaymentResponse payCurrentFacture(
-            PayCurrentFactureRequest request
-    ) {
+            PayCurrentFactureRequest request) {
         LocalDate currentMonth = LocalDate.now().withDayOfMonth(1);
 
         Facture facture = factureRepository
@@ -89,17 +82,14 @@ public class FactureServiceImpl implements FactureService {
                         request.walletCode(),
                         request.serviceName(),
                         FactureStatus.UNPAID,
-                        currentMonth
-                )
+                        currentMonth)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Aucune facture impayée du mois en cours pour ce service."
-                ));
+                        "Aucune facture impayée du mois en cours pour ce service."));
 
         if (facture.getAmount().compareTo(request.amount()) != 0) {
             throw new BusinessException(
                     "Le montant envoyé ne correspond pas au montant de la facture : "
-                            + facture.getAmount()
-            );
+                            + facture.getAmount());
         }
 
         LocalDateTime paidAt = LocalDateTime.now();
@@ -111,21 +101,18 @@ public class FactureServiceImpl implements FactureService {
                 request.serviceName().name(),
                 List.of(facture.getReference()),
                 facture.getAmount(),
-                paidAt
-        );
+                paidAt);
     }
 
     @Override
     public FacturePaymentResponse paySpecificFactures(
-            PaySpecificFacturesRequest request
-    ) {
+            PaySpecificFacturesRequest request) {
         List<Facture> factures = request.factureReferences()
                 .stream()
                 .map(reference -> factureRepository
                         .findByReferenceAndWalletCode(reference, request.walletCode())
                         .orElseThrow(() -> new ResourceNotFoundException(
-                                "Facture introuvable : " + reference
-                        )))
+                                "Facture introuvable : " + reference)))
                 .toList();
 
         for (Facture facture : factures) {
@@ -134,16 +121,14 @@ public class FactureServiceImpl implements FactureService {
                         "La facture "
                                 + facture.getReference()
                                 + " ne correspond pas au service "
-                                + request.serviceName()
-                );
+                                + request.serviceName());
             }
 
             if (facture.getStatus() == FactureStatus.PAID) {
                 throw new BusinessException(
                         "La facture "
                                 + facture.getReference()
-                                + " est déjà payée."
-                );
+                                + " est déjà payée.");
             }
         }
 
@@ -163,8 +148,7 @@ public class FactureServiceImpl implements FactureService {
                 request.serviceName().name(),
                 factures.stream().map(Facture::getReference).toList(),
                 total,
-                paidAt
-        );
+                paidAt);
     }
 
     private FactureResponse toResponse(Facture facture) {
@@ -177,7 +161,6 @@ public class FactureServiceImpl implements FactureService {
                 facture.getStatus().name(),
                 facture.getBillingMonth(),
                 facture.getDueDate(),
-                facture.getPaidAt()
-        );
+                facture.getPaidAt());
     }
 }

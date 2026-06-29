@@ -1,4 +1,4 @@
-package main.java.edu.ism.payment_service.dto.request;
+package edu.ism.payment_service.dto.request;
 
 import edu.ism.payment_service.entity.ServiceName;
 import jakarta.validation.constraints.NotBlank;
@@ -8,13 +8,9 @@ import java.util.List;
 
 public record PaySpecificFacturesRequest(
 
-        @NotBlank(message = "Le code wallet est obligatoire.")
-        String walletCode,
+        @NotBlank(message = "Le code wallet est obligatoire.") String walletCode,
 
-        @NotNull(message = "Le service est obligatoire.")
-        ServiceName serviceName,
+        @NotNull(message = "Le service est obligatoire.") ServiceName serviceName,
 
-        @NotEmpty(message = "Au moins une référence de facture est obligatoire.")
-        List<String> factureReferences
-) {
+        @NotEmpty(message = "Au moins une référence de facture est obligatoire.") List<String> factureReferences) {
 }

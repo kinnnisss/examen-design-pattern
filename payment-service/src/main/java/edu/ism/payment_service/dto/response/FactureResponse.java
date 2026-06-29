@@ -1,4 +1,4 @@
-package main.java.edu.ism.payment_service.dto.response;
+package edu.ism.payment_service.dto.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,6 +13,5 @@ public record FactureResponse(
         String status,
         LocalDate billingMonth,
         LocalDate dueDate,
-        LocalDateTime paidAt
-) {
+        LocalDateTime paidAt) {
 }

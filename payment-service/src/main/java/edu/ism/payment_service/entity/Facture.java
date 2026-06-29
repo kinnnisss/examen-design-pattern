@@ -1,5 +1,5 @@
 
-package main.java.edu.ism.payment_service.entity;
+package edu.ism.payment_service.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,4 +1,4 @@
-package main.java.edu.ism.payment_service.repository;
+package edu.ism.payment_service.repository;
 
 import edu.ism.payment_service.entity.Facture;
 import edu.ism.payment_service.entity.FactureStatus;
@@ -13,22 +13,19 @@ public interface FactureRepository extends JpaRepository<Facture, Long> {
     List<Facture> findByWalletCodeAndStatusAndBillingMonth(
             String walletCode,
             FactureStatus status,
-            LocalDate billingMonth
-    );
+            LocalDate billingMonth);
 
     List<Facture> findByWalletCodeAndStatusAndBillingMonthAndUnite(
             String walletCode,
             FactureStatus status,
             LocalDate billingMonth,
-            String unite
-    );
+            String unite);
 
     List<Facture> findByWalletCodeAndStatusAndBillingMonthBetween(
             String walletCode,
             FactureStatus status,
             LocalDate debut,
-            LocalDate fin
-    );
+            LocalDate fin);
 
     Optional<Facture> findByReferenceAndWalletCode(String reference, String walletCode);
 
@@ -36,6 +33,5 @@ public interface FactureRepository extends JpaRepository<Facture, Long> {
             String walletCode,
             ServiceName serviceName,
             FactureStatus status,
-            LocalDate billingMonth
-    );
+            LocalDate billingMonth);
 }

@@ -1,4 +1,4 @@
-package main.java.edu.ism.payment_service.exception;
+package edu.ism.payment_service.exception;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -15,22 +15,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(
-            ResourceNotFoundException exception
-    ) {
+            ResourceNotFoundException exception) {
         return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), Map.of());
     }
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Map<String, Object>> handleBusiness(
-            BusinessException exception
-    ) {
+            BusinessException exception) {
         return buildResponse(HttpStatus.BAD_REQUEST, exception.getMessage(), Map.of());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(
-            MethodArgumentNotValidException exception
-    ) {
+            MethodArgumentNotValidException exception) {
         Map<String, String> errors = new LinkedHashMap<>();
 
         exception.getBindingResult().getAllErrors().forEach(error -> {
@@ -41,15 +38,13 @@ public class GlobalExceptionHandler {
         return buildResponse(
                 HttpStatus.BAD_REQUEST,
                 "Les données envoyées sont invalides.",
-                errors
-        );
+                errors);
     }
 
     private ResponseEntity<Map<String, Object>> buildResponse(
             HttpStatus status,
             String message,
-            Map<String, String> validationErrors
-    ) {
+            Map<String, String> validationErrors) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", status.value());
