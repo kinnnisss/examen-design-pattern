@@ -1,0 +1,157 @@
+@walletHost = http://localhost:8080
+@paymentHost = http://localhost:8081
+
+### Créer un portefeuille
+POST {{walletHost}}/api/wallets
+Content-Type: application/json
+
+{
+  "phoneNumber": "+221779998877",
+  "email": "testclient@gmail.com",
+  "initialBalance": 25000,
+  "code": "WLT-TEST001",
+  "currency": "XOF"
+}
+
+### Lister les portefeuilles avec pagination
+GET {{walletHost}}/api/wallets?page=0&size=10
+
+### Consulter un portefeuille par numéro de téléphone
+GET {{walletHost}}/api/wallets/+221779998877
+### Test wallet introuvable
+GET {{walletHost}}/api/wallets/+221700000000
+
+### Consulter le solde d'un portefeuille
+GET {{walletHost}}/api/wallets/+221779998877/balance
+
+### Solde d'un portefeuille introuvable
+GET {{walletHost}}/api/wallets/+221700000000/balance
+
+### Faire un dépôt avec une carte bancaire
+POST {{walletHost}}/api/wallets/1/deposit
+Content-Type: application/json
+
+{
+  "amount": 50000.00,
+  "paymentMethod": "CREDIT_CARD"
+}
+
+### Test méthode de dépôt invalide
+POST {{walletHost}}/api/wallets/1/deposit
+Content-Type: application/json
+
+{
+  "amount": 50000.00,
+  "paymentMethod": "WAVE"
+}
+
+### Vérifier le solde après dépôt
+GET {{walletHost}}/api/wallets/+221779998877/balance
+
+### Faire un retrait
+POST {{walletHost}}/api/wallets/withdraw
+Content-Type: application/json
+
+{
+  "phoneNumber": "+221779998877",
+  "amount": 10000.00
+}
+
+### Test retrait avec solde insuffisant
+POST {{walletHost}}/api/wallets/withdraw
+Content-Type: application/json
+
+{
+  "phoneNumber": "+221779998877",
+  "amount": 999999999.00
+}
+
+### Créer le wallet expéditeur
+POST {{walletHost}}/api/wallets
+Content-Type: application/json
+
+{
+  "phoneNumber": "+221770000001",
+  "email": "sender@gmail.com",
+  "initialBalance": 10000.00,
+  "code": "WLT-SENDER001",
+  "currency": "XOF"
+}
+
+### Créer le wallet destinataire
+POST {{walletHost}}/api/wallets
+Content-Type: application/json
+
+{
+  "phoneNumber": "+221770000002",
+  "email": "receiver@gmail.com",
+  "initialBalance": 1000.00,
+  "code": "WLT-RECEIVER001",
+  "currency": "XOF"
+}
+
+
+### Faire un transfert entre deux portefeuilles
+POST {{walletHost}}/api/wallets/transfer
+Content-Type: application/json
+
+{
+  "senderPhone": "+221770000001",
+  "receiverPhone": "+221770000002",
+  "amount": 2000.00
+}
+
+
+### Transfert avec solde insuffisant
+POST {{walletHost}}/api/wallets/transfer
+Content-Type: application/json
+
+{
+  "senderPhone": "+221770000001",
+  "receiverPhone": "+221770000002",
+  "amount": 999999.00
+}
+
+### Transfert vers le même wallet
+POST {{walletHost}}/api/wallets/transfer
+Content-Type: application/json
+
+{
+  "senderPhone": "+221770000001",
+  "receiverPhone": "+221770000001",
+  "amount": 1000.00
+}
+
+### Consulter l'historique des transactions
+GET {{walletHost}}/api/wallets/+221779998877/transactions
+Content-Type: application/json
+
+### Payment-service - factures impayées du mois courant
+GET {{paymentHost}}/api/internal/factures/WLT-0000003/current
+
+###
+
+### Payment-service - filtre WOYAFAL
+GET {{paymentHost}}/api/internal/factures/WLT-0000003/current?unite=WOYAFAL
+
+###
+
+### Payment-service - factures impayées par période.
+GET {{paymentHost}}/api/internal/factures/WLT-0000003/periode?debut=2026-05-01&fin=2026-07-01
+
+
+### Proxy - factures impayées du mois en cours
+GET {{walletHost}}/api/external/factures/WLT-0000003/current
+Content-Type: application/json
+
+###
+
+### Proxy - factures impayées du mois courant filtrées par unité
+GET {{walletHost}}/api/external/factures/WLT-0000003/current?unite=WOYAFAL
+Content-Type: application/json
+
+###
+
+### Proxy - factures impayées sur une période
+GET {{walletHost}}/api/external/factures/WLT-0000003/periode?debut=2026-05-01&fin=2026-07-01
+Content-Type: application/json
