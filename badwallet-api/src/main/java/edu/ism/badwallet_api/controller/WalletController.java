@@ -23,7 +23,9 @@ import edu.ism.badwallet_api.dto.response.WalletBalanceResponse;
 import edu.ism.badwallet_api.dto.request.TransferRequest;
 import edu.ism.badwallet_api.dto.response.TransferResponse;
 import edu.ism.badwallet_api.dto.response.TransactionResponse;
+import edu.ism.badwallet_api.service.WalletSeedService;
 import java.util.List;
+
 
 
 
@@ -33,7 +35,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WalletController {
 
+
     private final WalletService walletService;
+    private final WalletSeedService walletSeedService;
+
 
     @PostMapping
     public ResponseEntity<WalletResponse> createWallet(
@@ -105,5 +110,31 @@ public ResponseEntity<TransferResponse> transfer(
 ) {
     return ResponseEntity.ok(walletService.transfer(request));
 }
+@PostMapping("/seed")
+public ResponseEntity<String> seedWallets(
+        @RequestParam(defaultValue = "10") int numWallets,
+        @RequestParam(defaultValue = "100") int eventsPerWallet
+) {
+    if (numWallets < 1 || numWallets > 1000) {
+        throw new IllegalArgumentException(
+                "Le nombre de wallets doit être compris entre 1 et 1000."
+        );
+    }
 
+    if (eventsPerWallet < 0 || eventsPerWallet > 1000) {
+        throw new IllegalArgumentException(
+                "Le nombre d'événements par wallet doit être compris entre 0 et 1000."
+        );
+    }
+
+    walletSeedService.seedWalletsAsync(numWallets, eventsPerWallet);
+
+    String message = "Seeding lancé en arrière-plan : "
+            + numWallets
+            + " wallets et "
+            + eventsPerWallet
+            + " événements par wallet.";
+
+    return ResponseEntity.accepted().body(message);
+}
 }
