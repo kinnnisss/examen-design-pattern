@@ -1,2 +1,14 @@
 @walletHost = http://localhost:8080
 @paymentHost = http://localhost:8081
+
+### Créer un portefeuille
+POST {{walletHost}}/api/wallets
+Content-Type: application/json
+
+{
+  "phoneNumber": "+221779998877",
+  "email": "testclient@gmail.com",
+  "initialBalance": 25000,
+  "code": "WLT-TEST001",
+  "currency": "XOF"
+}
