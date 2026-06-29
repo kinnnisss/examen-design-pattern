@@ -1,9 +1,10 @@
 package edu.ism.badwallet_api.service.impl;
-
+import edu.ism.badwallet_api.exception.ResourceNotFoundException;
 import edu.ism.badwallet_api.dto.request.CreateWalletRequest;
 import edu.ism.badwallet_api.dto.response.WalletResponse;
 import edu.ism.badwallet_api.entity.Wallet;
 import edu.ism.badwallet_api.exception.BusinessException;
+import edu.ism.badwallet_api.exception.ResourceNotFoundException;
 import edu.ism.badwallet_api.mapper.WalletMapper;
 import edu.ism.badwallet_api.repository.WalletRepository;
 import edu.ism.badwallet_api.service.WalletService;
@@ -46,6 +47,16 @@ public class WalletServiceImpl implements WalletService {
                 .map(WalletMapper::toResponse);
     }
 
+    @Override
+@Transactional(readOnly = true)
+public WalletResponse getWalletByPhoneNumber(String phoneNumber) {
+    Wallet wallet = walletRepository.findByPhoneNumber(phoneNumber)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                    "Aucun portefeuille trouvé pour le numéro : " + phoneNumber
+            ));
+
+    return WalletMapper.toResponse(wallet);
+}
     private void validateUniqueness(CreateWalletRequest request) {
         if (walletRepository.existsByPhoneNumber(request.phoneNumber())) {
             throw new BusinessException("Un portefeuille existe déjà avec ce numéro de téléphone.");

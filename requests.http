@@ -15,3 +15,8 @@ Content-Type: application/json
 
 ### Lister les portefeuilles avec pagination
 GET {{walletHost}}/api/wallets?page=0&size=10
+
+### Consulter un portefeuille par numéro de téléphone
+GET {{walletHost}}/api/wallets/+221779998877
+### Test wallet introuvable
+GET {{walletHost}}/api/wallets/+221700000000
