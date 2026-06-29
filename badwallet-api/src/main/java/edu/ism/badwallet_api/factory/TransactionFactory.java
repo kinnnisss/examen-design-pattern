@@ -27,4 +27,21 @@ public final class TransactionFactory {
 
         return transaction;
     }
+
+    public static Transaction createWithdrawal(
+            Wallet wallet,
+            BigDecimal amount,
+            BigDecimal fee
+    ) {
+        Transaction transaction = new Transaction();
+        transaction.setWallet(wallet);
+        transaction.setType(TransactionType.WITHDRAWAL);
+        transaction.setAmount(amount);
+        transaction.setFee(fee);
+        transaction.setCurrency(wallet.getCurrency());
+        transaction.setPaymentMethod("CASH_OUT");
+        transaction.setDescription("Retrait depuis le portefeuille");
+
+        return transaction;
+    }
 }

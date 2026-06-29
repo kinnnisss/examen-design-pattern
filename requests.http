@@ -47,3 +47,21 @@ Content-Type: application/json
 
 ### Vérifier le solde après dépôt
 GET {{walletHost}}/api/wallets/+221779998877/balance
+
+### Faire un retrait
+POST {{walletHost}}/api/wallets/withdraw
+Content-Type: application/json
+
+{
+  "phoneNumber": "+221779998877",
+  "amount": 10000.00
+}
+
+### Test retrait avec solde insuffisant
+POST {{walletHost}}/api/wallets/withdraw
+Content-Type: application/json
+
+{
+  "phoneNumber": "+221779998877",
+  "amount": 999999999.00
+}
