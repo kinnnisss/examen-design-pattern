@@ -16,11 +16,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import edu.ism.badwallet_api.dto.response.WalletBalanceResponse;
+import edu.ism.badwallet_api.dto.request.DepositRequest;
+import edu.ism.badwallet_api.dto.response.DepositResponse;
+import edu.ism.badwallet_api.entity.Transaction;
+import edu.ism.badwallet_api.exception.ResourceNotFoundException;
+import edu.ism.badwallet_api.factory.TransactionFactory;
+import edu.ism.badwallet_api.repository.TransactionRepository;
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class WalletServiceImpl implements WalletService {
-
+    private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
 
     @Override
@@ -85,4 +91,32 @@ public WalletResponse getWalletByPhoneNumber(String phoneNumber) {
             throw new BusinessException("Un portefeuille existe déjà avec ce code.");
         }
     }
+    @Override
+public DepositResponse deposit(Long walletId, DepositRequest request) {
+    Wallet wallet = walletRepository.findById(walletId)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                    "Aucun portefeuille trouvé avec l'identifiant : " + walletId
+            ));
+
+    wallet.setBalance(wallet.getBalance().add(request.amount()));
+
+    Transaction transaction = TransactionFactory.createDeposit(
+            wallet,
+            request.amount(),
+            request.paymentMethod()
+    );
+
+    Transaction savedTransaction = transactionRepository.save(transaction);
+
+    return new DepositResponse(
+            savedTransaction.getId(),
+            wallet.getId(),
+            wallet.getPhoneNumber(),
+            request.amount(),
+            request.paymentMethod().name(),
+            wallet.getBalance(),
+            wallet.getCurrency(),
+            savedTransaction.getCreatedAt()
+    );
+}
 }

@@ -26,3 +26,24 @@ GET {{walletHost}}/api/wallets/+221779998877/balance
 
 ### Solde d'un portefeuille introuvable
 GET {{walletHost}}/api/wallets/+221700000000/balance
+
+### Faire un dépôt avec une carte bancaire
+POST {{walletHost}}/api/wallets/1/deposit
+Content-Type: application/json
+
+{
+  "amount": 50000.00,
+  "paymentMethod": "CREDIT_CARD"
+}
+
+### Test méthode de dépôt invalide
+POST {{walletHost}}/api/wallets/1/deposit
+Content-Type: application/json
+
+{
+  "amount": 50000.00,
+  "paymentMethod": "WAVE"
+}
+
+### Vérifier le solde après dépôt
+GET {{walletHost}}/api/wallets/+221779998877/balance
