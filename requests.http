@@ -1,0 +1,2 @@
+@walletHost = http://localhost:8080
+@paymentHost = http://localhost:8081
