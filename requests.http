@@ -136,7 +136,7 @@ GET {{paymentHost}}/api/internal/factures/WLT-0000003/current?unite=WOYAFAL
 
 ###
 
-### Payment-service - factures impayées par période
+### Payment-service - factures impayées par période.
 GET {{paymentHost}}/api/internal/factures/WLT-0000003/periode?debut=2026-05-01&fin=2026-07-01
 
 
