@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
+import edu.ism.badwallet_api.dto.response.WalletBalanceResponse;
 @RestController
 @RequestMapping("/api/wallets")
 @RequiredArgsConstructor
@@ -48,6 +49,14 @@ public class WalletController {
 
         return ResponseEntity.ok(walletService.getAllWallets(page, size));
     }
+    @GetMapping("/{phoneNumber}/balance")
+public ResponseEntity<WalletBalanceResponse> getWalletBalance(
+        @PathVariable String phoneNumber
+) {
+    return ResponseEntity.ok(
+            walletService.getWalletBalance(phoneNumber)
+    );
+}
     @GetMapping("/{phoneNumber}")
 public ResponseEntity<WalletResponse> getWalletByPhoneNumber(
         @PathVariable String phoneNumber

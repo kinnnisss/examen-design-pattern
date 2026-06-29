@@ -15,7 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import edu.ism.badwallet_api.dto.response.WalletBalanceResponse;
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -23,6 +23,21 @@ public class WalletServiceImpl implements WalletService {
 
     private final WalletRepository walletRepository;
 
+    @Override
+@Transactional(readOnly = true)
+public WalletBalanceResponse getWalletBalance(String phoneNumber) {
+    Wallet wallet = walletRepository.findByPhoneNumber(phoneNumber)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                    "Aucun portefeuille trouvé pour le numéro : " + phoneNumber
+            ));
+
+    return new WalletBalanceResponse(
+            wallet.getPhoneNumber(),
+            wallet.getCode(),
+            wallet.getCurrency(),
+            wallet.getBalance()
+    );
+}
     @Override
     public WalletResponse createWallet(CreateWalletRequest request) {
         validateUniqueness(request);

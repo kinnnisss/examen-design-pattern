@@ -20,3 +20,9 @@ GET {{walletHost}}/api/wallets?page=0&size=10
 GET {{walletHost}}/api/wallets/+221779998877
 ### Test wallet introuvable
 GET {{walletHost}}/api/wallets/+221700000000
+
+### Consulter le solde d'un portefeuille
+GET {{walletHost}}/api/wallets/+221779998877/balance
+
+### Solde d'un portefeuille introuvable
+GET {{walletHost}}/api/wallets/+221700000000/balance
